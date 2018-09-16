@@ -1,0 +1,17 @@
+{
+  "name": "ai-balls",
+  "version": "1.0.0",
+  "main": "main.js",
+  "repository": "git@github.com:johsam/ai-balls.git",
+  "author": "johsam",
+  "license": "MIT",
+  "homepage": "https://johsam.github.io/ai-balls",
+  "scripts": {
+    "start": "./node_modules/.bin/lite-server",
+    "deploy" : "./node_modules/.bin/gh-pages -d dist"
+  },
+  "dependencies": {
+    "gh-pages": "^2.0.0",
+    "lite-server": "^2.4.0"
+  }
+}

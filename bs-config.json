@@ -1,0 +1,10 @@
+{
+    "port": 8000,
+    "uiport": 8001,
+    "injectChanges": true,
+    "server": { "baseDir": "./dist" },
+    "open": false,
+    "ui": {
+        "port": 8001
+    }
+}
