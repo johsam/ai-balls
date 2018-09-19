@@ -432,21 +432,14 @@ var Neuroevolution = function (options) {
 	Generation.prototype.generateNextGeneration = function () {
 		var nexts = [];
 
-		self._bornAs = {
-			nImmortals: 0,
-			nElites: 0,
-			nRandomized: 0,
-			nchildren: 0,	
-			born: []
-		};
+		self._bornAs = []
 		
 		// Copy immortals
 
 		for (var i = 0; i < self.options.population ; i++) {
 			if (this.genomes[i].score >= self.options.immortalScore) {
 				nexts.push(JSON.parse(JSON.stringify(this.genomes[i].network)));
-				self._bornAs.nImmortals++;
-				self._bornAs.born.push(0);
+				self._bornAs.push(0);
 			}
 		}
 		
@@ -456,8 +449,7 @@ var Neuroevolution = function (options) {
 				if (nexts.length < self.options.population) {
 					// Push a deep copy of ith Genome's Nethwork.
 					nexts.push(JSON.parse(JSON.stringify(this.genomes[i].network)));
-					self._bornAs.nElites++;
-					self._bornAs.born.push(1);
+					self._bornAs.push(1);
 				}
 			}
 		}
@@ -471,8 +463,7 @@ var Neuroevolution = function (options) {
 				}
 				if (nexts.length < self.options.population) {
 					nexts.push(n);
-					self._bornAs.nRandomized++;
-					self._bornAs.born.push(2);
+					self._bornAs.push(2);
 				}
 			}
 		}
@@ -489,8 +480,7 @@ var Neuroevolution = function (options) {
 				for (var c in childs) {
 					if (nexts.length < self.options.population) {
 						nexts.push(childs[c].network);
-						self._bornAs.nchildren++;
-						self._bornAs.born.push(3);
+						self._bornAs.push(3);
 					}
 
 					if (nexts.length >= self.options.population) {

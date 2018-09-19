@@ -1,6 +1,5 @@
-/* global Neuroevolution:true */
+/* global Neuroevolution:true , BALL_STATE_RANDOMIZED*/
 /* eslint no-plusplus: off */
-
 
 /* eslint-disable-next-line*/
 class Simulation {
@@ -18,8 +17,11 @@ class Simulation {
             network: [3, [6], 1],
             immortalScore: 1000
         });
+
         this._gen = [];
         this._genCount = 0;
+
+        this._neuvol._bornAs = [];
     }
 
     get balls() {
@@ -54,7 +56,6 @@ class Simulation {
         return immortals;
     }
 
-
     anyAlive() {
         return this._balls.some((ball) => {
             if (ball.alive) {
@@ -71,29 +72,17 @@ class Simulation {
     reset(delay) {
         var self = this;
         self._resetting = true;
-        self._gen = self._neuvol.nextGeneration(1000);
+        self._gen = self._neuvol.nextGeneration();
         self._genCount++;
 
         setTimeout(function() {
-            if (self._neuvol._bornAs) {
-                console.log(
-                    'Immortals',
-                    self._neuvol._bornAs.nImmortals,
-                    'Elite',
-                    self._neuvol._bornAs.nElites,
-                    'Randomized',
-                    self._neuvol._bornAs.nRandomized,
-                    'Children',
-                    self._neuvol._bornAs.nchildren
-                );
-            }
-
             self._balls.forEach((ball, idx) => {
-                if (self._neuvol._bornAs) {
-                    self._balls[idx].bornAs = self._neuvol._bornAs.born[idx];
+                if (self._neuvol._bornAs.length > 0) {
+                    self._balls[idx].bornAs = self._neuvol._bornAs[idx];
                 } else {
-                    self._balls[idx].bornAs = ball.RANDOMIZED;
+                    self._balls[idx].bornAs = BALL_STATE_RANDOMIZED;
                 }
+
                 ball.reset();
             });
 
@@ -101,6 +90,8 @@ class Simulation {
                 setTimeout(function() {
                     self._balls[self._balls.length - b].start(); // Best first
                     //self._balls[b - 1].start();   // Worst first
+
+                    /*eslint no-param-reassign:0*/
                     if (--b) {
                         releaseBalls(b);
                     } else {
