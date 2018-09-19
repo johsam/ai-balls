@@ -138,10 +138,10 @@ planck.testbed = function(opts, callback) {
                     ctx.save();
                     ctx.transform(1, 0, 0, -1, -testbed.x, -testbed.y);
                     
-                    ctx.scale(0.5,0.5);
+                    //ctx.scale(1,1);
 
                     ctx.fillStyle = "white";
-                    ctx.font = "10px Arial";
+                    ctx.font = "2px Lucida Console";
                     ctx.fillText(text,p.x,p.y);
                     
                     ctx.restore();

@@ -53,7 +53,7 @@ planck.testbed('ai-balls', function(testbed) {
 
     boxes.push(new Box(testbed, upperGround, -30, 100));
     boxes.push(new Box(testbed, upperGround, -10, 200));
-    //boxes.push(new Box(testbed, upperGround, 5, 220));
+    boxes.push(new Box(testbed, upperGround, 5, 220));
     boxes.push(new Box(testbed, upperGround, 30, 300));
 
     boxes.push(new Box(testbed, lowerGround, 30, 400));
@@ -150,10 +150,10 @@ planck.testbed('ai-balls', function(testbed) {
     });
 
     testbed.step = function(/*dt, t*/) {
-        this.drawText(Vec2(0, 20), 'Immortals ' + simulation.immortalCount());
-        this.drawText(Vec2(0, 0), 'Alive ' + simulation.aliveCount());
-        this.drawText(Vec2(0, -20), 'Gen ' + simulation.genCount());
-        //this.drawText(Vec2(10, 8), 'Test');
+        
+        this.drawText(Vec2(20, -24), 'Gen:     ' + simulation.genCount());
+        this.drawText(Vec2(20, -22), 'Alive:   ' + simulation.aliveCount() + '/' + BALLS);
+        this.drawText(Vec2(20, -20), 'Winners: ' + simulation.immortalCount());
 
         if (simulation.anyAlive()) {
             boxes.forEach((box) => {
@@ -183,7 +183,7 @@ planck.testbed('ai-balls', function(testbed) {
 
                     if (ball.distance() > 0) {
                         var jump = simulation.think(ball.id, inputs);
-                        if (jump[0] >= 0.7) {
+                        if (jump[0] >= 0.5) {
                             ball.jump();
                         }
                     }
