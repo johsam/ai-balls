@@ -13,7 +13,7 @@ class Ball {
         const shape = planck.Circle(1.0);
         this._idx = id;
 
-        this._x = -45 + Math.random() * 7;
+        this._x = -45 + Math.random() * 0;
         this._y = 35;
         this._alive = true;
         this._airborne = true;
@@ -125,7 +125,7 @@ class Ball {
         if (this._airborne === false) {
             this._airborne = true;
             this._jumps++;
-            this._body.applyLinearImpulse(planck.Vec2(0, 24), this._body.getWorldCenter());
+            this._body.applyLinearImpulse(planck.Vec2(0, 26), this._body.getWorldCenter());
         }
     }
 
