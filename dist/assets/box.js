@@ -1,4 +1,4 @@
-/* global pl:true, Vec2:true , pl:true*/
+/* global planck:true */
 
 /* eslint-disable-next-line*/
 class Box {
@@ -6,9 +6,9 @@ class Box {
         this.testbed = testbed;
         this.parent = parent;
         this.color = testbed.color(0.0, 0.0, 1.0);
-        this.left = Vec2.zero();
+        this.left = planck.Vec2.zero();
 
-        this.top = parent.createFixture(pl.Edge(Vec2(xpos - 2, 2), Vec2(xpos + 2, 2)), {
+        this.top = parent.createFixture(planck.Edge(planck.Vec2(xpos - 2, 2), planck.Vec2(xpos + 2, 2)), {
             isSensor: true,
             userData: {
                 tag: 'box',
@@ -20,7 +20,7 @@ class Box {
 
         if (parent.getUserData().upper === true) {
             this.upper = true;
-            this.side = parent.createFixture(pl.Edge(Vec2(xpos - 2, 0), Vec2(xpos - 2, 2)), {
+            this.side = parent.createFixture(planck.Edge(planck.Vec2(xpos - 2, 0), planck.Vec2(xpos - 2, 2)), {
                 isSensor: true,
                 userData: {
                     tag: 'box',
@@ -32,7 +32,7 @@ class Box {
         } else {
             this.upper = false;
 
-            this.side = parent.createFixture(pl.Edge(Vec2(xpos + 2, 0), Vec2(xpos + 2, 2)), {
+            this.side = parent.createFixture(planck.Edge(planck.Vec2(xpos + 2, 0), planck.Vec2(xpos + 2, 2)), {
                 isSensor: true,
                 userData: {
                     tag: 'box',
@@ -44,6 +44,7 @@ class Box {
         }
     }
 
+    /*eslint class-methods-use-this:0*/
     draw() {
         //this.testbed.drawCircle(this.edge, 0.3, this.color);
     }
@@ -53,7 +54,7 @@ class Box {
         var side = this.side.getShape();
         var v0 = side.m_vertex1;
         var v1 = side.m_vertex2;
-        var center = Vec2.mid(v0, v1);
-        this.edge = pl.Transform.mul(xf, center);
+        var center = planck.Vec2.mid(v0, v1);
+        this.edge = planck.Transform.mul(xf, center);
     }
 }

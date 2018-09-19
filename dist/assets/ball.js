@@ -1,18 +1,16 @@
-/* global pl:true, Vec2:true */
+/* global planck */
+
+/* global BALL_STATE_IMMORTAL:true :true, BALL_STATE_RANDOMIZED:true, BALL_STATE_EXPIRED:true */
+/* global BALL_STATE_CHILD:true, BALL_STATE_DEAD:true */
+
 /* eslint class-methods-use-this: off*/
 /* eslint prefer-destructuring: off*/
 /* eslint no-plusplus: off */
 
-const IMMORTAL = 0;
-const ELITE = 1;
-const RANDOMIZED = 2;
-const CHILD = 3;
-const DEAD = 4;
-
 /* eslint-disable-next-line*/
 class Ball {
     constructor(testbed, world, id) {
-        const shape = pl.Circle(1.0);
+        const shape = planck.Circle(1.0);
         this._idx = id;
 
         this._x = -45 + Math.random() * 7;
@@ -21,11 +19,14 @@ class Ball {
         this._airborne = true;
         this._upper = true;
         this._bounced = false;
-        this._bornAs = CHILD;
+        this._bornAs = BALL_STATE_DEAD;
         this._jumps = 0;
         this._jumpAttemps = 0;
+        this._maxJumps = 10;
+
+        this._ticks = 0;
         this._testbed = testbed;
-        this._body = world.createDynamicBody(Vec2(this.x, this.y));
+        this._body = world.createDynamicBody(planck.Vec2(this.x, this.y));
         this._fixture = this._body.createFixture(shape, {
             restitution: 0.1,
             density: 1,
@@ -44,31 +45,17 @@ class Ball {
         this._body.setActive(false);
     }
 
-    get IMMORTAL() {
-        return IMMORTAL;
-    }
-
-    get ELITE() {
-        return ELITE;
-    }
-
-    get RANDOMIZED() {
-        return RANDOMIZED;
-    }
-    get CHILD() {
-        return CHILD;
-    }
-    get DEAD() {
-        return DEAD;
-    }
-
     get id() {
         return this._idx;
     }
 
+    tick() {
+        this._ticks++;
+    }
+
     reset() {
-        this._body.setPosition(Vec2(this._x, this._y));
-        this._body.setLinearVelocity(Vec2(0.0, 0.0));
+        this._body.setPosition(planck.Vec2(this._x, this._y));
+        this._body.setLinearVelocity(planck.Vec2(0.0, 0.0));
         this._body.setAngularVelocity(0.0);
         this._alive = true;
         this._airborne = true;
@@ -77,6 +64,7 @@ class Ball {
         this._jumps = 0;
         this._boxClosest = undefined;
         this._boxDistance = 0;
+        this._ticks = 0;
     }
 
     start() {
@@ -84,10 +72,10 @@ class Ball {
     }
 
     set alive(alive) {
-        this.bornAs = DEAD;
+        this.bornAs = BALL_STATE_DEAD;
         this._alive = alive;
         this._body.setActive(alive);
-        this._body.setLinearVelocity(Vec2(0.0, 0.0));
+        this._body.setLinearVelocity(planck.Vec2(0.0, 0.0));
         this._body.setAngularVelocity(0.0);
     }
 
@@ -128,40 +116,16 @@ class Ball {
     }
 
     jump() {
-        
-        if (this._jumps > 6) {
-            this.bornAs = DEAD;
+        if (this._jumps > this._maxJumps) {
+            this.bornAs = BALL_STATE_EXPIRED;
             return;
         }
-        
+
         this._jumpAttemps++;
         if (this._airborne === false) {
             this._airborne = true;
             this._jumps++;
-            this._body.applyLinearImpulse(Vec2(0, 25), this._body.getWorldCenter());
-        }
-    }
-
-    jumpHigher() {
-        this._jumpAttemps++;
-        
-        
-        if (this._jumps > 6) {
-            this.bornAs = DEAD;
-
-            return;
-        }
-        
-        if (this._airborne === false) {
-            
-            if (this._jumps > 25) {
-                this.jump()
-                return;
-            }
-            
-            this._airborne = true;
-            this._jumps++;
-            this._body.applyLinearImpulse(Vec2(0, 35), this._body.getWorldCenter());
+            this._body.applyLinearImpulse(planck.Vec2(0, 24), this._body.getWorldCenter());
         }
     }
 
@@ -177,20 +141,24 @@ class Ball {
             this._fixture.render = {};
         }
 
-        if (t === IMMORTAL) {
+        if (t === BALL_STATE_IMMORTAL) {
             this._fixture.render = { fill: '#45d643', stroke: 'black' };
         }
 
-        if (t === RANDOMIZED) {
+        if (t === BALL_STATE_RANDOMIZED) {
             this._fixture.render = { fill: '#d6bb45', stroke: 'black' };
         }
 
-        if (t === CHILD) {
+        if (t === BALL_STATE_CHILD) {
             this._fixture.render = { fill: '#0077ff', stroke: 'black' };
         }
 
-        if (t === DEAD) {
+        if (t === BALL_STATE_DEAD) {
             this._fixture.render = { fill: '#d6456e', stroke: 'black' };
+        }
+
+        if (t === BALL_STATE_EXPIRED) {
+            this._fixture.render = { fill: '#d60000', stroke: 'black' };
         }
     }
 
@@ -205,7 +173,7 @@ class Ball {
     calcDistance(boxes) {
         const xf = this._body.getTransform();
         const circle = this._fixture.getShape();
-        const center = pl.Transform.mul(xf, circle.getCenter());
+        const center = planck.Transform.mul(xf, circle.getCenter());
         let minDist = 1000;
 
         this._boxClosest = undefined;
@@ -220,7 +188,7 @@ class Ball {
             if (this.upper === box.upper) {
                 if (this.upper) {
                     if (center.x <= edge.x) {
-                        dist = Vec2.distance(center, edge);
+                        dist = planck.Vec2.distance(center, edge);
                         if (dist < minDist) {
                             minDist = dist;
                             this._boxClosest = idx;
@@ -228,7 +196,7 @@ class Ball {
                         }
                     }
                 } else if (center.x >= edge.x) {
-                    dist = Vec2.distance(center, edge);
+                    dist = planck.Vec2.distance(center, edge);
                     if (dist < minDist) {
                         minDist = dist;
                         this._boxClosest = idx;
@@ -242,13 +210,19 @@ class Ball {
     draw(boxes) {
         const xf = this._body.getTransform();
         const circle = this._fixture.getShape();
-        const center = pl.Transform.mul(xf, circle.getCenter());
+        const center = planck.Transform.mul(xf, circle.getCenter());
 
-        if (this._airborne && this._bornAs > IMMORTAL && this._bounced && this.alive && this._boxClosest !== undefined) {
+        if (
+            this._airborne
+            && (this._bornAs !== BALL_STATE_IMMORTAL && this._bornAs !== BALL_STATE_DEAD && this._bornAs !== BALL_STATE_EXPIRED)
+            && this._bounced
+            && this.alive
+            && this._boxClosest !== undefined
+        ) {
             const edge = boxes[this._boxClosest].edge;
             const radius = circle.getRadius();
             const angle = this._body.getAngle();
-            const from = center.clone().add(Vec2(radius * Math.cos(angle), radius * Math.sin(angle)));
+            const from = center.clone().add(planck.Vec2(radius * Math.cos(angle), radius * Math.sin(angle)));
             this._testbed.drawSegment(from, edge, this._grayColor);
         }
     }

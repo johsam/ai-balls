@@ -5,10 +5,14 @@
 
 const MAXSPEED = 50;
 const MAXDISTANCE = 40;
-const BALLS = 100;
+const BALLS = 200;
 
-var pl = planck;
-var Vec2 = planck.Vec2;
+const BALL_STATE_IMMORTAL = 0; // eslint-disable-line
+const BALL_STATE_ELITE = 1; // eslint-disable-line
+const BALL_STATE_RANDOMIZED = 2; // eslint-disable-line
+const BALL_STATE_CHILD = 3; // eslint-disable-line
+const BALL_STATE_DEAD = 4; // eslint-disable-line
+const BALL_STATE_EXPIRED = 5; // eslint-disable-line
 
 planck.testbed('ai-balls', function(testbed) {
     testbed.y = 0;
@@ -16,14 +20,17 @@ planck.testbed('ai-balls', function(testbed) {
     //testbed.height = 64;
     //testbed.ratio =16;
 
-    var world = new pl.World(Vec2(0, -10));
+    const pl = planck;
+    const Vec2 = pl.Vec2;
+
+    var world = new planck.World(Vec2(0, -10));
     var simulation = new Simulation(BALLS);
     var boxes = [];
 
     //world.setGravity(Vec2(0.0, -12.0));
 
     var upperGround = world.createBody({ userData: { upper: true } });
-    upperGround.createFixture(pl.Edge(Vec2(-50.0, 0.0), Vec2(40.0, 0.0)), {
+    upperGround.createFixture(planck.Edge(Vec2(-50.0, 0.0), Vec2(40.0, 0.0)), {
         userData: { tag: 'ground', upper: true }
     });
 
@@ -71,7 +78,7 @@ planck.testbed('ai-balls', function(testbed) {
         simulation.balls.push(new Ball(testbed, world, i));
     }
 
-    simulation.reset(0);
+    simulation.reset();
 
     //var maxDistance = 0;
 
@@ -112,7 +119,8 @@ planck.testbed('ai-balls', function(testbed) {
                 setTimeout(function() {
                     self.alive = false;
                     if (winner === true) {
-                        self.bornAs = self.IMMORTAL;
+                        //console.log(self._ticks);
+                        self.bornAs = BALL_STATE_IMMORTAL;
                     }
                 }, 0);
             }
@@ -141,8 +149,7 @@ planck.testbed('ai-balls', function(testbed) {
         }
     });
 
-    testbed.step = function(dt, t) {
-        
+    testbed.step = function(/*dt, t*/) {
         this.drawText(Vec2(0, 20), 'Immortals ' + simulation.immortalCount());
         this.drawText(Vec2(0, 0), 'Alive ' + simulation.aliveCount());
         this.drawText(Vec2(0, -20), 'Gen ' + simulation.genCount());
@@ -154,7 +161,15 @@ planck.testbed('ai-balls', function(testbed) {
             });
 
             simulation.balls.forEach((ball) => {
+                /*
+                if (ball._ticks > 2500) {
+                    ball.bornAs = BALL_STATE_EXPIRED;
+                    ball.alive = false;
+                }
+                */
+
                 if (ball.alive) {
+                    ball.tick();
                     ball.calcDistance(boxes);
 
                     var vel = ball.velocity();
@@ -163,22 +178,12 @@ planck.testbed('ai-balls', function(testbed) {
                         vel.x *= MAXSPEED;
                         vel.y *= MAXSPEED;
                     }
-                    /*
-
-                    if (ball.distance() > maxDistance) {
-                        maxDistance = ball.distance;
-                        console.log('Vel',maxVelocity,'Dist',maxDistance)
-                    }
-                    */
 
                     var inputs = [ball.airborne ? 1 : 0, vel.length(), ball.distance()];
 
                     if (ball.distance() > 0) {
-
                         var jump = simulation.think(ball.id, inputs);
                         if (jump[0] >= 0.7) {
-                            ball.jump();
-                        } else if (jump[0] >= 0.5) {
                             ball.jump();
                         }
                     }
