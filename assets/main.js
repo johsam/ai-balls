@@ -183,8 +183,8 @@ planck.testbed('ai-balls', function(testbed) {
 
                     if (ball.distance() > 0) {
                         var jump = simulation.think(ball.id, inputs);
-                        if (jump[0] >= 0.5) {
-                            ball.jump();
+                        if (jump[0] >= 0.7) {
+                            ball.jump(jump[0]);
                         }
                     }
                 }

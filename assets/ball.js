@@ -115,7 +115,7 @@ class Ball {
         return this._bornAs;
     }
 
-    jump() {
+    jump(height) {
         if (this._jumps > this._maxJumps) {
             this.bornAs = BALL_STATE_EXPIRED;
             return;
@@ -125,7 +125,7 @@ class Ball {
         if (this._airborne === false) {
             this._airborne = true;
             this._jumps++;
-            this._body.applyLinearImpulse(planck.Vec2(0, 26), this._body.getWorldCenter());
+            this._body.applyLinearImpulse(planck.Vec2(0, 15 + height*10), this._body.getWorldCenter());
         }
     }
 

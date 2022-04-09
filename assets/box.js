@@ -7,8 +7,20 @@ class Box {
         this.parent = parent;
         this.color = testbed.color(0.0, 0.0, 1.0);
         this.left = planck.Vec2.zero();
+        this.height = 1.5 + Math.random() * 1.0;
 
-        this.top = parent.createFixture(planck.Edge(planck.Vec2(xpos - 2, 2), planck.Vec2(xpos + 2, 2)), {
+        this.roof = parent.createFixture(planck.Edge(planck.Vec2(xpos - 4, this.height + 3), planck.Vec2(xpos + 4, this.height + 3)), {
+            isSensor: true,
+            userData: {
+                tag: 'box',
+                top: true,
+                score: score + 50,
+                self: this
+            }
+        });
+
+
+        this.top = parent.createFixture(planck.Edge(planck.Vec2(xpos - 2, this.height), planck.Vec2(xpos + 2, this.height)), {
             isSensor: true,
             userData: {
                 tag: 'box',
@@ -20,7 +32,7 @@ class Box {
 
         if (parent.getUserData().upper === true) {
             this.upper = true;
-            this.side = parent.createFixture(planck.Edge(planck.Vec2(xpos - 2, 0), planck.Vec2(xpos - 2, 2)), {
+            this.side = parent.createFixture(planck.Edge(planck.Vec2(xpos - 2, 0), planck.Vec2(xpos - 2, this.height)), {
                 isSensor: true,
                 userData: {
                     tag: 'box',
@@ -32,7 +44,7 @@ class Box {
         } else {
             this.upper = false;
 
-            this.side = parent.createFixture(planck.Edge(planck.Vec2(xpos + 2, 0), planck.Vec2(xpos + 2, 2)), {
+            this.side = parent.createFixture(planck.Edge(planck.Vec2(xpos + 2, 0), planck.Vec2(xpos + 2, this.height)), {
                 isSensor: true,
                 userData: {
                     tag: 'box',

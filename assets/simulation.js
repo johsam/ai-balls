@@ -10,8 +10,8 @@ class Simulation {
             population: n,
             randomBehaviour: 0.2, // 0.2
             randomCutoff: 0.2, // 0.2
-            elitism: 0.1, // 0.2
-            mutationRate: 0.1, // 0.1
+            elitism: 0.05, // 0.2
+            mutationRate: 0.2, // 0.1
             mutationRange: 0.5, //0.5
             nbChild: 4, //1
             network: [3, [6], 1],
